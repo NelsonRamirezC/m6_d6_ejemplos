@@ -16,6 +16,19 @@
         #cuerpoTabla a.iconEliminar {
             color:red;
         }
+
+        #cuerpoTabla a.iconActualizar {
+            color: rgb(186, 186, 82);
+        }
+
+        #updateModal label {
+            width: 60px;
+        }
+        #updateModal div {
+            margin-bottom: 10px;
+        }
+    
+    
     </style>
 </head>
 <body>
@@ -39,12 +52,13 @@
         <section class="py-5 overflow-x-auto">
             <h2 class="text-center py-3">Listado de productos.</h2>
             <table class="table">
-                <thead>
+                <thead class="text-center">
                   <tr>
                     <th scope="col">ID</th>
                     <th scope="col">Nombre</th>
                     <th scope="col">Precio</th>
                     <th scope="col">Eliminar</th>
+                    <th scope="col">Actualizar</th>
                   </tr>
                 </thead>
                 <tbody id="cuerpoTabla">
@@ -53,6 +67,41 @@
               </table>
         </section>
     </main>
+
+
+
+
+    M<!-- ODAL UPDATE PRODUCTO -->
+    <div class="modal fade" id="updateModal" tabindex="-1" aria-labelledby="updateModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h2 class="modal-title fs-5" id="updateModalLabel">Formulario UPDATE Producto</h2>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <label for="updateProductoId">ID</label>
+                    <input type="text" id="updateProductoId" name="id" disabled>
+                </div>
+                <div>
+                    <label for="updateProductoNombre" class="d-block">Nombre:</label>
+                     <textarea type="text" id="updateProductoNombre" name="nombre" style="margin-left: 65px;">
+                    </textarea>
+                </div>
+                <div>
+                    <label for="updateProductoPrecio">Precio:</label>
+                    <input type="number" id="updateProductoPrecio" name="precio">
+                </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-primary">Guardar cambios</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
 
 
 
@@ -80,7 +129,29 @@
                     //volvemos a llamar a función getProductos para recargar la tabla con el listado de productos sin el producto eliminado.
                     getProductos();
                 })
-            })
+            });
+
+
+            let btnsActulizar = document.querySelectorAll("a.iconActualizar");
+
+            btnsActulizar.forEach(btnActualizar => {
+                btnActualizar.addEventListener("click", async (event) => {
+                    event.preventDefault();
+                    let id = event.target.dataset.id;
+
+                    let response = await fetch("/api/productos?id="+id);
+                    let data = await response.json();
+
+                    console.log(data);
+
+                    //ACTUALIZAR INFO EN EL MODAL
+                    updateProductoId.value = id;
+                    updateProductoNombre.value = data.producto.nombre;
+                    updateProductoPrecio.value = data.producto.precio;
+
+
+                })
+            });
 
         }
 
@@ -92,10 +163,11 @@
             for (const pr of productos) {
                 filas += `
                     <tr>
-                        <th scope="row">${pr.id}</th>
+                        <th scope="row" class="text-center">${pr.id}</th>
                         <td>${pr.nombre}</td>
-                        <td>$${pr.precio.toLocaleString("es-ES")}.-</td>
-                        <td><a href="" class="iconEliminar"><i class="bi bi-trash3-fill" data-id="${pr.id}"></i></a></td>
+                        <td class="text-center">$${pr.precio.toLocaleString("es-ES")}.-</td>
+                        <td class="text-center"><a href="" class="iconEliminar"><i class="bi bi-trash3-fill" data-id="${pr.id}"></i></a></td>
+                        <td class="text-center"><a href="" class="iconActualizar" data-bs-toggle="modal" data-bs-target="#updateModal"><i class="bi bi-pencil-square" data-id="${pr.id}"></i></a></td>
                     </tr>
                   `
             };

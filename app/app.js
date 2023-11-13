@@ -15,7 +15,30 @@ const server = http.createServer(async (req, res) => {
 
         res.setHeader("Content-Type", "application/json");
         res.end(productos);
-    } else if (req.url == "/api/productos" && req.method == "POST") {
+    }else if(req.url.startsWith("/api/productos?id") && req.method == "GET"){
+
+        let id = urlArgumentos.query.id;
+        console.log(id);
+
+        let dataJson = await fs.readFile(__dirname + "/data/productos.json", "utf8");
+
+        dataJson = JSON.parse(dataJson);
+
+        let producto = dataJson.productos.find(producto => producto.id == id);
+
+        res.setHeader("Content-Type", "application/json");
+        if(producto){
+            res.statusCode = 200;
+            res.end(JSON.stringify({code: 200, message: "producto encontrado.", producto}));
+        }else {
+            res.statusCode = 404;
+            res.end(JSON.stringify({code: 404, message: "producto no encontrado."}));
+        }
+    
+
+    }
+    
+    else if (req.url == "/api/productos" && req.method == "POST") {
         res.setHeader("Content-Type", "application/json");
         res.statusCode = 201;
 
@@ -31,7 +54,7 @@ const server = http.createServer(async (req, res) => {
                 payload.id = uuidv4().slice(0, 6);
                 payload.precio = Number(payload.precio);
                 console.log("payload: ", payload);
-    
+
 
                 let dataJson = await fs.readFile(__dirname + "/data/productos.json", "utf8");
 
@@ -48,12 +71,12 @@ const server = http.createServer(async (req, res) => {
             } catch (error) {
                 console.log(error);
                 res.statusCode = 400;
-                res.end(JSON.stringify({code: 400, message: "Debe proporcionar datos válidos."}))
+                res.end(JSON.stringify({ code: 400, message: "Debe proporcionar datos válidos." }))
             }
         })
 
 
-    }else if(req.url.startsWith("/api/productos?id") && req.method == "DELETE"){
+    } else if (req.url.startsWith("/api/productos?id") && req.method == "DELETE") {
 
         let id = urlArgumentos.query.id;
 
@@ -71,7 +94,32 @@ const server = http.createServer(async (req, res) => {
         await fs.writeFile(__dirname + "/data/productos.json", JSON.stringify(dataJson, null, 4), "utf8");
 
         res.setHeader("Content-Type", "application/json");
-        res.end(JSON.stringify({code: 200, message:"Producto eliminado."}))
+        res.end(JSON.stringify({ code: 200, message: "Producto eliminado." }))
+    } else if (req.url == "/api/productos" && req.method == "PUT") {
+
+        let data = '';
+
+        req.on('data', (chunk) => {
+            data += chunk;
+        });
+
+        req.on('end', async () => {
+            try {
+                res.setHeader("Content-Type", "application/json");
+                let id = data.id;
+                let nombre = data.nombre;
+                let precio = Number(data.precio);
+
+                console.log(id, nombre, precio);
+                res.statusCode = 200;
+                res.end(JSON.stringify({code: 200, message: "Producto actualizado con éxito."}))
+
+            } catch (error) {
+                res.statusCode = 500;
+                res.end(JSON.stringify({code: 500, message: "Error al intentar actualizar producto."}))
+            }
+        })
+
     }
     else if (req.url == "/" && req.method == "GET") {
 
@@ -80,7 +128,9 @@ const server = http.createServer(async (req, res) => {
         res.end(vista);
 
     } else {
-        res.end("Ruta desconocida.");
+        res.setHeader("Content-Type", "application/json");
+        res.statusCode = 404;
+        res.end(JSON.stringify({code: 404, message: "Ruta desconocida."}));
     }
 })
 

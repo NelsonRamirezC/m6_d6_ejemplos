@@ -2,8 +2,13 @@
     "productos": [
         {
             "nombre": "Televisor 50 pulgadas Samsung",
-            "precio": 350000,
+            "precio": 450000,
             "id": "fa5947"
+        },
+        {
+            "nombre": "Lavadora carga frontal",
+            "precio": 350000,
+            "id": "da6b01"
         }
     ]
 }
