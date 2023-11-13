@@ -1,0 +1,9 @@
+{
+  "productos": [
+    {
+        "id": 1,
+        "nombre": "Lavadora carga frontal",
+        "precio": 250000
+    }
+  ]  
+}
