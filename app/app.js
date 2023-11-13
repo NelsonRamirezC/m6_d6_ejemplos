@@ -26,7 +26,9 @@ const server = http.createServer(async (req, res) => {
             try {
                 const payload = JSON.parse(data);
                 payload.id = uuidv4().slice(0, 6);
+                payload.precio = Number(payload.precio);
                 console.log("payload: ", payload);
+    
 
                 let dataJson = await fs.readFile(__dirname + "/data/productos.json", "utf8");
 

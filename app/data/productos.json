@@ -7,13 +7,23 @@
         },
         {
             "nombre": "Televisor LG 50 pulgadas",
-            "precio": "300000",
+            "precio": 300000,
             "id": "af969d"
         },
         {
             "nombre": "Radio AM/FM con entrada usb",
-            "precio": "30000",
+            "precio": 30000,
             "id": "a46f4d"
+        },
+        {
+            "nombre": "Notebook Asus Tuf",
+            "precio": 850000,
+            "id": "7377ba"
+        },
+        {
+            "nombre": "Notebook Asus Tuf 15",
+            "precio": 1000000,
+            "id": "d48a19"
         }
     ]
 }

@@ -14,7 +14,8 @@
     </header>
     
     <main class="container">
-        <h2 class="text-center py-3">Crear productos</h2>
+        <section>
+            <h2 class="text-center py-3">Crear productos</h2>
         <form class="w-50 mx-auto" id="formAddProductos">
             <label for="addNombre" class="form-label">Nombre</label>
             <input type="text" id="addNombre" name="nombre" class="form-control" required>
@@ -23,12 +24,60 @@
             <input type="text" id="addPrecio" name="precio" class="form-control" required>
             <input type="submit" class="btn btn-primary mt-2" value="Agregar">
         </form>
+        </section>
+
+        <section class="py-5">
+            <h2 class="text-center py-3">Listado de productos.</h2>
+            <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Precio</th>
+                  </tr>
+                </thead>
+                <tbody id="cuerpoTabla">
+    
+                </tbody>
+              </table>
+        </section>
     </main>
 
 
 
     <script>
         const formAddProductos = document.getElementById("formAddProductos");
+
+        const actualizarTabla = (productos = []) => {
+            const cuerpoTabla = document.getElementById("cuerpoTabla");
+            let filas = "";
+
+            for (const pr of productos) {
+                filas += `
+                    <tr>
+                        <th scope="row">${pr.id}</th>
+                        <td>${pr.nombre}</td>
+                        <td>$${pr.precio.toLocaleString("es-ES")}.-</td>
+                    </tr>
+                  `
+            };
+
+            cuerpoTabla.innerHTML = filas;
+        }
+
+        const getProductos = async () => {
+            let response = await fetch("/api/productos");
+            let data = await response.json();
+
+            actualizarTabla(data.productos);
+        }
+
+        const main =  () => {
+            getProductos();
+        }
+
+        main();
+
 
         formAddProductos.addEventListener("submit", async (event) => {
             event.preventDefault();
@@ -45,6 +94,8 @@
             let data = await response.json();
 
             console.log(data);
+            formAddProductos.reset();
+            getProductos();
 
         })
     </script>
