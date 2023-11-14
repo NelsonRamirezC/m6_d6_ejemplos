@@ -106,13 +106,28 @@ const server = http.createServer(async (req, res) => {
         req.on('end', async () => {
             try {
                 res.setHeader("Content-Type", "application/json");
+                data = JSON.parse(data);
                 let id = data.id;
                 let nombre = data.nombre;
                 let precio = Number(data.precio);
 
-                console.log(id, nombre, precio);
-                res.statusCode = 200;
-                res.end(JSON.stringify({code: 200, message: "Producto actualizado con éxito."}))
+                console.log("Datos", id, nombre, precio);
+                let dataJson = JSON.parse(await fs.readFile(__dirname + "/data/productos.json", "utf8"));
+
+                let productoBuscado = dataJson.productos.find(producto => producto.id == id);
+
+                if(productoBuscado){
+                    productoBuscado.nombre = nombre;
+                    productoBuscado.precio = precio;
+                    await fs.writeFile(__dirname + "/data/productos.json", JSON.stringify(dataJson, null, 4), "utf8");
+                    res.statusCode = 200;
+                    res.end(JSON.stringify({code: 200, message: "Producto actualizado correctamente", producto: productoBuscado}))
+
+                }else {
+                    res.statusCode = 404;
+                    res.end(JSON.stringify({code: 404, message: "Producto no existe en el sistema."}))
+                }
+
 
             } catch (error) {
                 res.statusCode = 500;

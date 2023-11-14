@@ -11,6 +11,8 @@
     <!-- ICONOS DE bootstrap -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+
     <style>
 
         #cuerpoTabla a.iconEliminar {
@@ -71,36 +73,38 @@
 
 
 
-    M<!-- ODAL UPDATE PRODUCTO -->
+    <!-- MODAL UPDATE PRODUCTO -->
     <div class="modal fade" id="updateModal" tabindex="-1" aria-labelledby="updateModalLabel" aria-hidden="true">
         <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h2 class="modal-title fs-5" id="updateModalLabel">Formulario UPDATE Producto</h2>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div>
-                    <label for="updateProductoId">ID</label>
-                    <input type="text" id="updateProductoId" name="id" disabled>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title fs-5" id="updateModalLabel">Formulario UPDATE Producto</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div>
-                    <label for="updateProductoNombre" class="d-block">Nombre:</label>
-                     <textarea type="text" id="updateProductoNombre" name="nombre" style="margin-left: 65px;">
-                    </textarea>
+                <div class="modal-body">
+                    <div>
+                        <label for="updateProductoId">ID</label>
+                        <input type="text" id="updateProductoId" name="id" disabled>
+                    </div>
+                    <div>
+                        <label for="updateProductoNombre" class="d-block">Nombre:</label>
+                        <textarea type="text" id="updateProductoNombre" name="nombre" style="margin-left: 65px;">
+                        </textarea>
+                    </div>
+                    <div>
+                        <label for="updateProductoPrecio">Precio:</label>
+                        <input type="number" id="updateProductoPrecio" name="precio">
+                    </div>
                 </div>
-                <div>
-                    <label for="updateProductoPrecio">Precio:</label>
-                    <input type="number" id="updateProductoPrecio" name="precio">
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button id="btnActualizarProducto" type="button" class="btn btn-primary">Guardar cambios</button>
                 </div>
+
             </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-primary">Guardar cambios</button>
-            </div>
-          </div>
         </div>
-      </div>
+    </div>
       
 
 
@@ -120,14 +124,16 @@
                     event.preventDefault();
                     let id = event.target.dataset.id;
 
-                    let response = await fetch("/api/productos?id="+id, {
+                    if(confirm("Desea eliminar el producto con ID: "+ id)){
+                        let response = await fetch("/api/productos?id="+id, {
                         method: "DELETE"
-                    })
+                        })
 
-                    let data = await response.json();
+                        let data = await response.json();
 
-                    //volvemos a llamar a función getProductos para recargar la tabla con el listado de productos sin el producto eliminado.
-                    getProductos();
+                        //volvemos a llamar a función getProductos para recargar la tabla con el listado de productos sin el producto eliminado.
+                        getProductos();
+                    }
                 })
             });
 
@@ -141,8 +147,6 @@
 
                     let response = await fetch("/api/productos?id="+id);
                     let data = await response.json();
-
-                    console.log(data);
 
                     //ACTUALIZAR INFO EN EL MODAL
                     updateProductoId.value = id;
@@ -190,6 +194,7 @@
         main();
 
 
+        //EVENTO FORMULARIO PARA CREAR PRODUCTOS
         formAddProductos.addEventListener("submit", async (event) => {
             event.preventDefault();
 
@@ -203,12 +208,46 @@
             });
 
             let data = await response.json();
-
-            console.log(data);
             formAddProductos.reset();
             getProductos();
 
         });
+
+
+        //EVENTO PARA ACTUALIZAR PRODUCTO
+        const btnActualizarProducto = document.getElementById("btnActualizarProducto");
+
+        btnActualizarProducto.addEventListener("click", async (event) => {
+
+            if(confirm("Está seguro de actulizar los datos del producto?")){
+
+                let payload = {
+                    id: updateProductoId.value,
+                    nombre: updateProductoNombre.value,
+                    precio: updateProductoPrecio.value
+                }
+
+                let response = await fetch("/api/productos", {
+                    method: "PUT",
+                    body: JSON.stringify(payload)
+                })
+
+                let data = await response.json();
+
+                if(data.code == 200){
+                    alert(data.message);
+
+                    $("#updateModal").modal('hide');
+
+                    getProductos();
+                    
+                }else {
+                    alert(data.message);
+                }
+                
+
+            }
+        })
 
 
     </script>
