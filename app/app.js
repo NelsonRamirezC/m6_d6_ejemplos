@@ -94,7 +94,7 @@ const server = http.createServer(async (req, res) => {
         await fs.writeFile(__dirname + "/data/productos.json", JSON.stringify(dataJson, null, 4), "utf8");
 
         res.setHeader("Content-Type", "application/json");
-        res.end(JSON.stringify({ code: 200, message: "Producto eliminado." }))
+        res.end(JSON.stringify({ code: 200, message: "Producto eliminado."}))
     } else if (req.url == "/api/productos" && req.method == "PUT") {
 
         let data = '';
